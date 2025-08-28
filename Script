@@ -1,0 +1,425 @@
+local a=game:GetService("\80\108\97\121\101\114\115")
+local b=game:GetService("\82\117\110\83\101\114\118\105\99\101")
+local c=a.LocalPlayer
+local d=false
+local e=false
+local f="\114\98\120\97\115\115\101\116\105\100\58\47\47\57\49\51\51\55\54\50\50\48"
+local g=nil
+local h=nil
+local i
+local function j()
+    while e do
+        task.wait()
+        local k=c.Character
+        if k then
+            local l=k:FindFirstChild("\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116")
+            if l then
+                l.Anchored=true
+                task.wait(0.2)
+                l.Anchored=false
+                task.wait()
+            end
+        end
+    end
+end
+local function m(n)
+    local o=n:FindFirstChildWhichIsA("\65\110\105\109\97\116\111\114")
+    if not o then
+        o=Instance.new("\65\110\105\109\97\116\111\114",n)
+    end
+    local p=Instance.new("\65\110\105\109\97\116\105\111\110")
+    p.AnimationId=f
+    g=o:LoadAnimation(p)
+    g.Priority=Enum.AnimationPriority.Movement
+    g:AdjustSpeed(6)
+    g:Play()
+    h=b.RenderStepped:Connect(function()
+        if n.MoveDirection.Magnitude==0 then
+            if g.IsPlaying then
+                g:Stop()
+            end
+        else
+            if not g.IsPlaying then
+                g:Play()
+                g:AdjustSpeed(6)
+            end
+        end
+    end)
+end
+local function q()
+    if g then g:Stop() end
+    if h then h:Disconnect() end
+end
+local function r()
+    local s=c.Character
+    if not s then return end
+    local t=s:FindFirstChild("\72\117\109\97\110\111\105\100")
+    if not t then return end
+    t.WalkSpeed=3
+    m(t)
+    d=true
+end
+local function u()
+    local v=c.Character
+    if not v then return end
+    local w=v:FindFirstChild("\72\117\109\97\110\111\105\100")
+    if not w then return end
+    w.WalkSpeed=16
+    q()
+    d=false
+end
+local function x(y)
+    local z=y:WaitForChild("\72\117\109\97\110\111\105\100")
+    y:WaitForChild("\65\110\105\109\97\116\101")
+    task.wait(0.5)
+    if d then r() end
+end
+if c.Character then x(c.Character) end
+c.CharacterAdded:Connect(x)
+task.wait(1)
+local A=game:GetService("\84\119\101\101\110\83\101\114\118\105\99\101")
+local B=game:GetService("\85\115\101\114\73\110\112\117\116\83\101\114\118\105\99\101")
+local C=c:WaitForChild("\80\108\97\121\101\114\71\117\105")
+local D=Instance.new("\83\99\114\101\101\110\71\117\105")
+D.Name="\86\69\88\65\95\73\110\116\101\114\102\97\99\101"
+D.Parent=C
+D.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+D.ResetOnSpawn=false
+local E=Instance.new("\70\114\97\109\101")
+E.Name="\77\97\105\110\70\114\97\109\101"
+E.Parent=D
+E.BackgroundColor3=Color3.fromRGB(138,43,226)
+E.BorderSizePixel=0
+E.Position=UDim2.new(0.5,-250,0.5,-175)
+E.Size=UDim2.new(0,500,0,350)
+E.Active=true
+E.Draggable=true
+local F=Instance.new("\85\73\67\111\114\110\101\114")
+F.CornerRadius=UDim.new(0,8)
+F.Parent=E
+local G=Instance.new("\70\114\97\109\101")
+G.Name="\84\105\116\108\101\66\97\114"
+G.Parent=E
+G.BackgroundColor3=Color3.fromRGB(0,0,0)
+G.BorderSizePixel=0
+G.Size=UDim2.new(1,0,0,40)
+local H=Instance.new("\85\73\67\111\114\110\101\114")
+H.CornerRadius=UDim.new(0,8)
+H.Parent=G
+local I=Instance.new("\70\114\97\109\101")
+I.Parent=G
+I.BackgroundColor3=Color3.fromRGB(0,0,0)
+I.BorderSizePixel=0
+I.Position=UDim2.new(0,0,0.5,0)
+I.Size=UDim2.new(1,0,0.5,0)
+local J=Instance.new("\84\101\120\116\76\97\98\101\108")
+J.Name="\84\105\116\108\101\76\97\98\101\108"
+J.Parent=G
+J.BackgroundTransparency=1
+J.Position=UDim2.new(0,15,0,0)
+J.Size=UDim2.new(0,200,1,0)
+J.Font=Enum.Font.SourceSansBold
+J.Text="\86\69\88\65"
+J.TextColor3=Color3.fromRGB(255,255,255)
+J.TextSize=16
+J.TextXAlignment=Enum.TextXAlignment.Left
+local K=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+K.Name="\77\105\110\105\109\105\122\101\66\117\116\116\111\110"
+K.Parent=G
+K.BackgroundColor3=Color3.fromRGB(255,255,255)
+K.BorderSizePixel=0
+K.Position=UDim2.new(1,-35,0,5)
+K.Size=UDim2.new(0,30,0,30)
+K.Font=Enum.Font.SourceSansBold
+K.Text="-"
+K.TextColor3=Color3.fromRGB(0,0,0)
+K.TextSize=14
+local L=Instance.new("\85\73\67\111\114\110\101\114")
+L.CornerRadius=UDim.new(0,4)
+L.Parent=K
+local M=Instance.new("\70\114\97\109\101")
+M.Name="\83\105\100\101\98\97\114"
+M.Parent=E
+M.BackgroundColor3=Color3.fromRGB(0,0,0)
+M.BorderSizePixel=0
+M.Position=UDim2.new(0,0,0,40)
+M.Size=UDim2.new(0,150,1,-40)
+local N=Instance.new("\70\114\97\109\101")
+N.Name="\66\111\114\100\101\114"
+N.Parent=M
+N.BackgroundColor3=Color3.fromRGB(255,255,255)
+N.BorderSizePixel=0
+N.Position=UDim2.new(1,0,0,0)
+N.Size=UDim2.new(0,1,1,0)
+local O=Instance.new("\70\114\97\109\101")
+O.Name="\67\111\110\116\101\110\116\65\114\101\97"
+O.Parent=E
+O.BackgroundColor3=Color3.fromRGB(138,43,226)
+O.BorderSizePixel=0
+O.Position=UDim2.new(0,150,0,40)
+O.Size=UDim2.new(1,-150,1,-40)
+local P={{text="\69\71\79\82\32\83\67\82\73\80\84",name="\69\103\111\114\83\99\114\105\112\116"},{text="\86\69\88\65",name="\86\101\120\97"},{text="\73\78\70\79",name="\73\110\102\111"}}
+local Q=nil
+local R={}
+for S,T in ipairs(P) do
+    local U=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+    U.Name=T.name
+    U.Parent=M
+    U.BackgroundColor3=Color3.fromRGB(0,0,0)
+    U.BorderSizePixel=0
+    U.Position=UDim2.new(0,0,0,(S-1)*35)
+    U.Size=UDim2.new(1,0,0,35)
+    U.Font=Enum.Font.SourceSansBold
+    U.Text=T.text
+    U.TextColor3=Color3.fromRGB(255,255,255)
+    U.TextSize=14
+    U.TextXAlignment=Enum.TextXAlignment.Left
+    local V=Instance.new("\85\73\80\97\100\100\105\110\103")
+    V.PaddingLeft=UDim.new(0,10)
+    V.Parent=U
+    R[T.name]=U
+    U.MouseButton1Click:Connect(function()
+        if Q then
+            Q.BackgroundColor3=Color3.fromRGB(0,0,0)
+            Q.TextColor3=Color3.fromRGB(255,255,255)
+        end
+        Q=U
+        U.BackgroundColor3=Color3.fromRGB(255,255,255)
+        U.TextColor3=Color3.fromRGB(0,0,0)
+        Y(T.name)
+    end)
+end
+local W={}
+local X=Instance.new("\70\114\97\109\101")
+X.Name="\69\103\111\114\83\99\114\105\112\116\67\111\110\116\101\110\116"
+X.Parent=O
+X.BackgroundTransparency=1
+X.Size=UDim2.new(1,0,1,0)
+X.Visible=false
+local Y1=Instance.new("\84\101\120\116\76\97\98\101\108")
+Y1.Parent=X
+Y1.BackgroundTransparency=1
+Y1.Position=UDim2.new(0,20,0,15)
+Y1.Size=UDim2.new(1,-40,0,30)
+Y1.Font=Enum.Font.SourceSansBold
+Y1.Text="\69\71\79\82\32\83\67\82\73\80\84"
+Y1.TextColor3=Color3.fromRGB(255,255,255)
+Y1.TextSize=18
+Y1.TextXAlignment=Enum.TextXAlignment.Left
+local Z=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+Z.Name="\69\103\111\114\84\111\103\103\108\101"
+Z.Parent=X
+Z.BackgroundColor3=Color3.fromRGB(255,255,255)
+Z.BorderSizePixel=0
+Z.Position=UDim2.new(0,20,0,60)
+Z.Size=UDim2.new(0,150,0,35)
+Z.Font=Enum.Font.SourceSansBold
+Z.Text="\69\110\97\98\108\101\32\65\108\108"
+Z.TextColor3=Color3.fromRGB(0,0,0)
+Z.TextSize=14
+local a1=Instance.new("\85\73\67\111\114\110\101\114")
+a1.CornerRadius=UDim.new(0,6)
+a1.Parent=Z
+W["\69\103\111\114\83\99\114\105\112\116"]=X
+local b1=Instance.new("\70\114\97\109\101")
+b1.Name="\86\101\120\97\67\111\110\116\101\110\116"
+b1.Parent=O
+b1.BackgroundTransparency=1
+b1.Size=UDim2.new(1,0,1,0)
+b1.Visible=false
+local c1=Instance.new("\84\101\120\116\76\97\98\101\108")
+c1.Parent=b1
+c1.BackgroundTransparency=1
+c1.Position=UDim2.new(0,20,0,15)
+c1.Size=UDim2.new(1,-40,0,30)
+c1.Font=Enum.Font.SourceSansBold
+c1.Text="\86\69\88\65"
+c1.TextColor3=Color3.fromRGB(255,255,255)
+c1.TextSize=18
+c1.TextXAlignment=Enum.TextXAlignment.Left
+local d1=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+d1.Name="\87\101\98\115\105\116\101\66\117\116\116\111\110"
+d1.Parent=b1
+d1.BackgroundColor3=Color3.fromRGB(255,255,255)
+d1.BorderSizePixel=0
+d1.Position=UDim2.new(0,20,0,60)
+d1.Size=UDim2.new(0,150,0,35)
+d1.Font=Enum.Font.SourceSansBold
+d1.Text="\87\101\98\115\105\116\101"
+d1.TextColor3=Color3.fromRGB(0,0,0)
+d1.TextSize=14
+local e1=Instance.new("\85\73\67\111\114\110\101\114")
+e1.CornerRadius=UDim.new(0,6)
+e1.Parent=d1
+local f1=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+f1.Name="\68\105\115\99\111\114\100\66\117\116\116\111\110"
+f1.Parent=b1
+f1.BackgroundColor3=Color3.fromRGB(255,255,255)
+f1.BorderSizePixel=0
+f1.Position=UDim2.new(0,20,0,110)
+f1.Size=UDim2.new(0,150,0,35)
+f1.Font=Enum.Font.SourceSansBold
+f1.Text="\68\105\115\99\111\114\100"
+f1.TextColor3=Color3.fromRGB(0,0,0)
+f1.TextSize=14
+local g1=Instance.new("\85\73\67\111\114\110\101\114")
+g1.CornerRadius=UDim.new(0,6)
+g1.Parent=f1
+W["\86\101\120\97"]=b1
+local h1=Instance.new("\70\114\97\109\101")
+h1.Name="\73\110\102\111\67\111\110\116\101\110\116"
+h1.Parent=O
+h1.BackgroundTransparency=1
+h1.Size=UDim2.new(1,0,1,0)
+h1.Visible=false
+local i1=Instance.new("\84\101\120\116\76\97\98\101\108")
+i1.Parent=h1
+i1.BackgroundTransparency=1
+i1.Position=UDim2.new(0,20,0,15)
+i1.Size=UDim2.new(1,-40,0,30)
+i1.Font=Enum.Font.SourceSansBold
+i1.Text="\73\78\70\79"
+i1.TextColor3=Color3.fromRGB(255,255,255)
+i1.TextSize=18
+i1.TextXAlignment=Enum.TextXAlignment.Left
+local j1=Instance.new("\84\101\120\116\76\97\98\101\108")
+j1.Parent=h1
+j1.BackgroundTransparency=1
+j1.Position=UDim2.new(0,20,0,60)
+j1.Size=UDim2.new(1,-40,0,20)
+j1.Font=Enum.Font.SourceSansBold
+j1.Text="\75\69\89\66\73\78\68\83\58"
+j1.TextColor3=Color3.fromRGB(255,255,255)
+j1.TextSize=14
+j1.TextXAlignment=Enum.TextXAlignment.Left
+local k1=Instance.new("\84\101\120\116\76\97\98\101\108")
+k1.Parent=h1
+k1.BackgroundTransparency=1
+k1.Position=UDim2.new(0,20,0,85)
+k1.Size=UDim2.new(1,-40,0,20)
+k1.Font=Enum.Font.SourceSans
+k1.Text="\71\32\45\32\84\111\103\103\108\101\32\85\73"
+k1.TextColor3=Color3.fromRGB(255,255,255)
+k1.TextSize=12
+k1.TextXAlignment=Enum.TextXAlignment.Left
+local l1=Instance.new("\84\101\120\116\76\97\98\101\108")
+l1.Parent=h1
+l1.BackgroundTransparency=1
+l1.Position=UDim2.new(0,20,0,120)
+l1.Size=UDim2.new(1,-40,0,20)
+l1.Font=Enum.Font.SourceSansBold
+l1.Text="\77\79\82\69\32\83\67\82\73\80\84\83\58"
+l1.TextColor3=Color3.fromRGB(255,255,255)
+l1.TextSize=14
+l1.TextXAlignment=Enum.TextXAlignment.Left
+local m1=Instance.new("\84\101\120\116\66\117\116\116\111\110")
+m1.Name="\77\111\114\101\83\99\114\105\112\116\115\66\117\116\116\111\110"
+m1.Parent=h1
+m1.BackgroundColor3=Color3.fromRGB(255,255,255)
+m1.BorderSizePixel=0
+m1.Position=UDim2.new(0,20,0,145)
+m1.Size=UDim2.new(0,200,0,35)
+m1.Font=Enum.Font.SourceSansBold
+m1.Text="\86\105\115\105\116\32\87\101\98\115\105\116\101\32\102\111\114\32\77\111\114\101\32\83\99\114\105\112\116\115"
+m1.TextColor3=Color3.fromRGB(0,0,0)
+m1.TextSize=12
+local n1=Instance.new("\85\73\67\111\114\110\101\114")
+n1.CornerRadius=UDim.new(0,6)
+n1.Parent=m1
+W["\73\110\102\111"]=h1
+local o1=Instance.new("\70\114\97\109\101")
+o1.Name="\78\111\116\105\102\105\99\97\116\105\111\110\70\114\97\109\101"
+o1.Parent=D
+o1.BackgroundColor3=Color3.fromRGB(138,43,226)
+o1.BorderSizePixel=0
+o1.Position=UDim2.new(0,20,1,-60)
+o1.Size=UDim2.new(0,250,0,40)
+o1.Visible=false
+local p1=Instance.new("\85\73\67\111\114\110\101\114")
+p1.CornerRadius=UDim.new(0,6)
+p1.Parent=o1
+local q1=Instance.new("\84\101\120\116\76\97\98\101\108")
+q1.Name="\78\111\116\105\102\105\99\97\116\105\111\110\84\101\120\116"
+q1.Parent=o1
+q1.BackgroundTransparency=1
+q1.Size=UDim2.new(1,-20,1,0)
+q1.Position=UDim2.new(0,10,0,0)
+q1.Font=Enum.Font.SourceSans
+q1.Text="\67\111\112\105\101\100\32\116\111\32\99\108\105\112\98\111\97\114\100\33"
+q1.TextColor3=Color3.fromRGB(255,255,255)
+q1.TextSize=14
+local function r1(s1)
+    q1.Text=s1
+    o1.Visible=true
+    o1.Position=UDim2.new(0,20,1,0)
+    local t1=A:Create(o1,TweenInfo.new(0.3,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Position=UDim2.new(0,20,1,-60)})
+    t1:Play()
+    task.wait(2)
+    local u1=A:Create(o1,TweenInfo.new(0.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=UDim2.new(0,20,1,0)})
+    u1:Play()
+    u1.Completed:Connect(function()
+        o1.Visible=false
+    end)
+end
+function Y(v1)
+    for _,w1 in pairs(W) do
+        w1.Visible=false
+    end
+    if W[v1] then
+        W[v1].Visible=true
+    end
+end
+local function x1(y1)
+    if setclipboard then
+        setclipboard(y1)
+        return true
+    end
+    return false
+end
+Z.MouseButton1Click:Connect(function()
+    d=not d
+    e=not e
+    if d then r() else u() end
+    if e then
+        i=coroutine.create(j)
+        coroutine.resume(i)
+    end
+    Z.Text=(d and e) and "\68\105\115\97\98\108\101\32\65\108\108" or "\69\110\97\98\108\101\32\65\108\108"
+end)
+d1.MouseButton1Click:Connect(function()
+    local z1="\104\116\116\112\115\58\47\47\115\105\116\101\115\46\103\111\111\103\108\101\46\99\111\109\47\118\105\101\119\47\118\101\120\97\115\99\114\105\112\116\115\47\104\111\109\101"
+    if x1(z1) then
+        spawn(function()
+            r1("\87\101\98\115\105\116\101\32\108\105\110\107\32\99\111\112\105\101\100\33")
+        end)
+    end
+end)
+f1.MouseButton1Click:Connect(function()
+    local A1="\104\116\116\112\115\58\47\47\100\105\115\99\111\114\100\46\103\103\47\69\121\57\117\71\104\112\51\118\81"
+    if x1(A1) then
+        spawn(function()
+            r1("\68\105\115\99\111\114\100\32\108\105\110\107\32\99\111\112\105\101\100\33")
+        end)
+    end
+end)
+m1.MouseButton1Click:Connect(function()
+    local B1="\104\116\116\112\115\58\47\47\115\105\116\101\115\46\103\111\111\103\108\101\46\99\111\109\47\118\105\101\119\47\118\101\120\97\115\99\114\105\112\116\115\47\104\111\109\101"
+    if x1(B1) then
+        spawn(function()
+            r1("\87\101\98\115\105\116\101\32\108\105\110\107\32\99\111\112\105\101\100\32\102\111\114\32\109\111\114\101\32\115\99\114\105\112\116\115\33")
+        end)
+    end
+end)
+K.MouseButton1Click:Connect(function()
+    E.Visible=false
+end)
+B.InputBegan:Connect(function(C1,D1)
+    if D1 then return end
+    if C1.KeyCode==Enum.KeyCode.G then
+        E.Visible=not E.Visible
+    end
+end)
+task.wait(0.5)
+if R["\69\103\111\114\83\99\114\105\112\116"] then
+    R["\69\103\111\114\83\99\114\105\112\116"].MouseButton1Click:Fire()
+end
