@@ -32,9 +32,9 @@ local TP = {
 	-- Give Guns 3-hop points
 	GiveA     = cf(814,     100.74, 2217.45),
 	GiveB     = cf(820,     100.74, 2216.91),
-	GiveC     = cf(-936.90, 94.25,  2050.45), -- 3rd hop
+	GiveC     = cf(-936.90, 94.25,  2050.45),
 
-	-- Individual gun pickup spots (exact coords)
+	-- Individual gun spots
 	AK        = cf(-936.93, 94.25,  2050.16),
 	Shotgun   = cf(820.45,  100.88, 2216.90),
 	Pistol    = cf(813.23,  100.88, 2216.93),
@@ -55,7 +55,7 @@ local TP = {
 	PoliceCar = cf(623.79,  98.40,  2494.25),
 }
 
--- ===== gun actions =====
+-- ===== guns =====
 local function giveGuns()
 	local char = waitForCharacter(player)
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -104,6 +104,41 @@ local function setNoclip(enabled)
 		end
 	end
 end
+
+-- ===== Return On Respawn (save death coords, auto-TP on respawn) =====
+local returnOnRespawn = false
+local lastDeathCF: CFrame? = nil
+local diedConn, charAddedConn
+
+local function bindDeathWatcher(char)
+	if diedConn then diedConn:Disconnect(); diedConn = nil end
+	local hum = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
+	local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
+
+	diedConn = hum.Died:Connect(function()
+		-- capture where you died (best-effort)
+		if hrp then
+			lastDeathCF = hrp.CFrame
+		end
+	end)
+end
+
+-- When character spawns, optionally return to last death spot
+local function onCharacterAdded(newChar)
+	bindDeathWatcher(newChar)
+	if returnOnRespawn and lastDeathCF then
+		-- wait a moment so character fully spawns before TP
+		task.spawn(function()
+			-- slight grace to avoid conflicting spawn scripts
+			task.wait(0.35)
+			tp(lastDeathCF)
+		end)
+	end
+end
+
+-- initial hook
+charAddedConn = player.CharacterAdded:Connect(onCharacterAdded)
+if player.Character then bindDeathWatcher(player.Character) end
 
 -- ===== UI pieces =====
 local gui, root, header
@@ -179,7 +214,7 @@ local function buildUI()
 	root.Name = "Root"
 	root.AnchorPoint = Vector2.new(1, 0.5)
 	root.Position = UDim2.new(1, -24, 0.5, 0)
-	root.Size = UDim2.new(0, 380, 0, 520)
+	root.Size = UDim2.new(0, 380, 0, 540)
 	root.BackgroundColor3 = Color3.fromRGB(15,15,15)
 	root.BackgroundTransparency = 0.25
 	root.Active = true
@@ -300,6 +335,13 @@ local function buildUI()
 	noclipBtn = Button(scroll, "Noclip: OFF", function()
 		setNoclip(not noclipEnabled)
 		noclipBtn.Text = ("Noclip: " .. (noclipEnabled and "ON" or "OFF"))
+	end)
+
+	-- Return on Respawn toggle
+	local rorBtn
+	rorBtn = Button(scroll, "Return On Respawn: OFF", function()
+		returnOnRespawn = not returnOnRespawn
+		rorBtn.Text = "Return On Respawn: " .. (returnOnRespawn and "ON" or "OFF")
 	end)
 
 	-- 3) Teleports (bottom of list)
