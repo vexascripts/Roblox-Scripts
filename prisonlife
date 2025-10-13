@@ -1,0 +1,213 @@
+-- CattoHub by catto lmao
+-- plz dont steal guts :c
+-- Discord: https://discord.gg/Ey9uGhp3vQ
+
+script.Name = "CattoHub"
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- === helpers ===
+local function waitForCharacter(p)
+	if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+		return p.Character
+	end
+	p.CharacterAdded:Wait()
+	p.Character:WaitForChild("HumanoidRootPart")
+	return p.Character
+end
+
+local function tp(cf)
+	local char = waitForCharacter(player)
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if hrp then hrp.CFrame = cf end
+end
+
+local function cf(x,y,z) return CFrame.new(x,y,z) end
+
+-- === teleport locations ===
+local TP = {
+	GiveA = cf(814, 100.74, 2217.45),
+	GiveB = cf(820, 100.74, 2216.91),
+	Yard  = cf(787.62, 96, 2469.90),
+	Police= cf(830, 99.98, 2250.01),
+	Escape= cf(665.53, 100, 2271.68),
+}
+
+local function giveGuns()
+	local char = waitForCharacter(player)
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+	local back = hrp.CFrame
+	tp(TP.GiveA)
+	task.wait(0.5)
+	tp(TP.GiveB)
+	task.wait(0.5)
+	tp(back)
+end
+
+-- === UI ===
+local gui = Instance.new("ScreenGui")
+gui.Name = "CattoHubUI"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local root = Instance.new("Frame")
+root.Name = "Root"
+root.AnchorPoint = Vector2.new(1, 0.5)
+root.Position = UDim2.new(1, -24, 0.5, 0)
+root.Size = UDim2.new(0, 360, 0, 420)
+root.BackgroundColor3 = Color3.fromRGB(12,12,12)
+root.BackgroundTransparency = 0.4
+root.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = root
+
+-- === header ===
+local header = Instance.new("Frame")
+header.BackgroundTransparency = 1
+header.Size = UDim2.new(1, -24, 0, 76)
+header.Position = UDim2.new(0, 12, 0, 10)
+header.Parent = root
+
+local avatar = Instance.new("ImageLabel")
+avatar.BackgroundTransparency = 1
+avatar.Size = UDim2.new(0, 56, 0, 56)
+avatar.Position = UDim2.new(0, 0, 0, 10)
+avatar.Parent = header
+
+local avatCorner = Instance.new("UICorner")
+avatCorner.CornerRadius = UDim.new(1, 0)
+avatCorner.Parent = avatar
+
+local title = Instance.new("TextLabel")
+title.BackgroundTransparency = 1
+title.Position = UDim2.new(0, 68, 0, 10)
+title.Size = UDim2.new(1, -68, 0, 28)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Text = "CATTO HUB"
+title.Parent = header
+
+local uname = Instance.new("TextLabel")
+uname.BackgroundTransparency = 1
+uname.Position = UDim2.new(0, 68, 0, 40)
+uname.Size = UDim2.new(1, -68, 0, 24)
+uname.Font = Enum.Font.Gotham
+uname.TextScaled = true
+uname.TextXAlignment = Enum.TextXAlignment.Left
+uname.TextColor3 = Color3.fromRGB(210,210,210)
+uname.Text = (player.DisplayName or player.Name)
+uname.Parent = header
+
+-- === discord row with copy button ===
+local discordRow = Instance.new("Frame")
+discordRow.BackgroundTransparency = 1
+discordRow.Position = UDim2.new(0, 12, 0, 92)
+discordRow.Size = UDim2.new(1, -24, 0, 36)
+discordRow.Parent = root
+
+local discordBtn = Instance.new("TextButton")
+discordBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+discordBtn.BackgroundTransparency = 0.2
+discordBtn.Size = UDim2.new(0.7, -4, 1, 0)
+discordBtn.Position = UDim2.new(0, 0, 0, 0)
+discordBtn.Text = "discord.gg/Ey9uGhp3vQ"
+discordBtn.Font = Enum.Font.Gotham
+discordBtn.TextScaled = true
+discordBtn.TextColor3 = Color3.fromRGB(230,230,230)
+discordBtn.AutoButtonColor = true
+discordBtn.Parent = discordRow
+
+local dCorner = Instance.new("UICorner")
+dCorner.CornerRadius = UDim.new(0, 10)
+dCorner.Parent = discordBtn
+
+local copyBtn = Instance.new("TextButton")
+copyBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+copyBtn.Size = UDim2.new(0.3, -4, 1, 0)
+copyBtn.Position = UDim2.new(0.7, 8, 0, 0)
+copyBtn.Text = "Copy Link"
+copyBtn.Font = Enum.Font.GothamBold
+copyBtn.TextScaled = true
+copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+copyBtn.Parent = discordRow
+
+local cCorner = Instance.new("UICorner")
+cCorner.CornerRadius = UDim.new(0, 10)
+cCorner.Parent = copyBtn
+
+copyBtn.MouseButton1Click:Connect(function()
+	pcall(function()
+		if setclipboard then setclipboard("https://discord.gg/Ey9uGhp3vQ") end
+	end)
+end)
+
+-- === scroll area ===
+local listHolder = Instance.new("Frame")
+listHolder.BackgroundTransparency = 1
+listHolder.Position = UDim2.new(0, 12, 0, 140)
+listHolder.Size = UDim2.new(1, -24, 1, -152)
+listHolder.Parent = root
+
+local scroll = Instance.new("ScrollingFrame")
+scroll.BackgroundTransparency = 1
+scroll.Size = UDim2.new(1, 0, 1, 0)
+scroll.CanvasSize = UDim2.new(0,0,0,0)
+scroll.ScrollBarThickness = 6
+scroll.Parent = listHolder
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 8)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = scroll
+
+local function updateCanvas()
+	scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 8)
+end
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+
+-- === buttons ===
+local function button(label)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1, 0, 0, 40)
+	b.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	b.Text = label
+	b.TextScaled = true
+	b.Font = Enum.Font.GothamMedium
+	b.TextColor3 = Color3.fromRGB(255,255,255)
+	b.AutoButtonColor = true
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 10)
+	c.Parent = b
+
+	b.Parent = scroll
+	return b
+end
+
+-- === actions ===
+local b1 = button("Give Guns")
+b1.MouseButton1Click:Connect(giveGuns)
+
+local b2 = button("Yard TP")
+b2.MouseButton1Click:Connect(function() tp(TP.Yard) end)
+
+local b3 = button("Police Office TP")
+b3.MouseButton1Click:Connect(function() tp(TP.Police) end)
+
+local b4 = button("Escape TP")
+b4.MouseButton1Click:Connect(function() tp(TP.Escape) end)
+
+-- === avatar ===
+task.spawn(function()
+	local content, _ = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+	avatar.Image = content
+end)
+
+updateCanvas()
