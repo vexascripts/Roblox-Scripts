@@ -32,7 +32,12 @@ local TP = {
 	-- Give Guns 3-hop points
 	GiveA     = cf(814,     100.74, 2217.45),
 	GiveB     = cf(820,     100.74, 2216.91),
-	GiveC     = cf(-936.90, 94.25,  2050.45), -- added hop
+	GiveC     = cf(-936.90, 94.25,  2050.45), -- 3rd hop
+
+	-- Individual gun pickup spots (exact coords)
+	AK        = cf(-936.93, 94.25,  2050.16),
+	Shotgun   = cf(820.45,  100.88, 2216.90),
+	Pistol    = cf(813.23,  100.88, 2216.93),
 
 	-- Core teleports
 	Yard      = cf(787.62,  96.00,  2469.90),
@@ -50,6 +55,7 @@ local TP = {
 	PoliceCar = cf(623.79,  98.40,  2494.25),
 }
 
+-- ===== gun actions =====
 local function giveGuns()
 	local char = waitForCharacter(player)
 	local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -60,6 +66,19 @@ local function giveGuns()
 	tp(TP.GiveC); task.wait(0.5)
 	tp(back)
 end
+
+local function quickHop(targetCF)
+	local char = waitForCharacter(player)
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+	local back = hrp.CFrame
+	tp(targetCF); task.wait(0.5)
+	tp(back)
+end
+
+local function hopAK()      quickHop(TP.AK) end
+local function hopShotgun() quickHop(TP.Shotgun) end
+local function hopPistol()  quickHop(TP.Pistol) end
 
 -- ===== noclip =====
 local noclipEnabled, noclipConn = false, nil
@@ -160,7 +179,7 @@ local function buildUI()
 	root.Name = "Root"
 	root.AnchorPoint = Vector2.new(1, 0.5)
 	root.Position = UDim2.new(1, -24, 0.5, 0)
-	root.Size = UDim2.new(0, 380, 0, 500)
+	root.Size = UDim2.new(0, 380, 0, 520)
 	root.BackgroundColor3 = Color3.fromRGB(15,15,15)
 	root.BackgroundTransparency = 0.25
 	root.Active = true
@@ -271,6 +290,9 @@ local function buildUI()
 	-- 1) Guns
 	SectionHeader(scroll, "Guns")
 	Button(scroll, "Give Guns", giveGuns)
+	Button(scroll, "AK-47",    hopAK)
+	Button(scroll, "Shotgun",  hopShotgun)
+	Button(scroll, "Pistol",   hopPistol)
 
 	-- 2) Other Actions
 	SectionHeader(scroll, "Other Actions")
@@ -294,7 +316,7 @@ local function buildUI()
 	Button(scroll, "Gate TP",          function() tp(TP.Gate) end)
 	Button(scroll, "Police Car TP",    function() tp(TP.PoliceCar) end)
 
-	-- end spacer (so last button isn't glued to the edge)
+	-- end spacer
 	do
 		local spacer = Instance.new("Frame")
 		spacer.BackgroundTransparency = 1
@@ -352,4 +374,3 @@ UIS.InputBegan:Connect(function(input, gp)
 		buildUI()
 	end
 end)
-
