@@ -105,8 +105,9 @@ local function setNoclip(enabled)
 	end
 end
 
--- ===== Return On Respawn (save death coords, auto-TP on respawn) =====
+-- ===== Return On Respawn + Auto Give on Spawn =====
 local returnOnRespawn = false
+local autoGiveOnSpawn = false
 local lastDeathCF: CFrame? = nil
 local diedConn, charAddedConn
 
@@ -114,29 +115,26 @@ local function bindDeathWatcher(char)
 	if diedConn then diedConn:Disconnect(); diedConn = nil end
 	local hum = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
 	local hrp = char:FindFirstChild("HumanoidRootPart") or char:WaitForChild("HumanoidRootPart")
-
 	diedConn = hum.Died:Connect(function()
-		-- capture where you died (best-effort)
-		if hrp then
-			lastDeathCF = hrp.CFrame
+		if hrp then lastDeathCF = hrp.CFrame end
+	end)
+end
+
+local function onCharacterAdded(newChar)
+	bindDeathWatcher(newChar)
+	-- Let spawn scripts finish, then optionally return to death spot, then optionally give guns
+	task.spawn(function()
+		task.wait(0.35)
+		if returnOnRespawn and lastDeathCF then
+			tp(lastDeathCF)
+			task.wait(0.35)
+		end
+		if autoGiveOnSpawn then
+			giveGuns()
 		end
 	end)
 end
 
--- When character spawns, optionally return to last death spot
-local function onCharacterAdded(newChar)
-	bindDeathWatcher(newChar)
-	if returnOnRespawn and lastDeathCF then
-		-- wait a moment so character fully spawns before TP
-		task.spawn(function()
-			-- slight grace to avoid conflicting spawn scripts
-			task.wait(0.35)
-			tp(lastDeathCF)
-		end)
-	end
-end
-
--- initial hook
 charAddedConn = player.CharacterAdded:Connect(onCharacterAdded)
 if player.Character then bindDeathWatcher(player.Character) end
 
@@ -214,7 +212,7 @@ local function buildUI()
 	root.Name = "Root"
 	root.AnchorPoint = Vector2.new(1, 0.5)
 	root.Position = UDim2.new(1, -24, 0.5, 0)
-	root.Size = UDim2.new(0, 380, 0, 540)
+	root.Size = UDim2.new(0, 380, 0, 560)
 	root.BackgroundColor3 = Color3.fromRGB(15,15,15)
 	root.BackgroundTransparency = 0.25
 	root.Active = true
@@ -342,6 +340,13 @@ local function buildUI()
 	rorBtn = Button(scroll, "Return On Respawn: OFF", function()
 		returnOnRespawn = not returnOnRespawn
 		rorBtn.Text = "Return On Respawn: " .. (returnOnRespawn and "ON" or "OFF")
+	end)
+
+	-- Auto Give Guns on Spawn toggle
+	local aggsBtn
+	aggsBtn = Button(scroll, "Auto Give Guns on Spawn: OFF", function()
+		autoGiveOnSpawn = not autoGiveOnSpawn
+		aggsBtn.Text = "Auto Give Guns on Spawn: " .. (autoGiveOnSpawn and "ON" or "OFF")
 	end)
 
 	-- 3) Teleports (bottom of list)
