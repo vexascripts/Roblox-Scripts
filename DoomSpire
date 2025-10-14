@@ -1,0 +1,374 @@
+-- CattoHub by catto lmao
+-- U a bitch if u steal ts cuz it's open-sourced, if u wanna work with it tho hmu Discord: damncatto
+-- Discord: https://discord.gg/Ey9uGhp3vQ
+
+script.Name = "CattoHub"
+
+local Players      = game:GetService("Players")
+local UIS          = game:GetService("UserInputService")
+local RunService   = game:GetService("RunService")
+local player       = Players.LocalPlayer
+
+-- ===== helpers =====
+local function waitForCharacter(p)
+	if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+		return p.Character
+	end
+	p.CharacterAdded:Wait()
+	p.Character:WaitForChild("HumanoidRootPart")
+	return p.Character
+end
+
+local function cf(x,y,z) return CFrame.new(x,y,z) end
+
+local function tp(cfTarget)
+	local char = waitForCharacter(player)
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if hrp then hrp.CFrame = cfTarget end
+end
+
+-- Teleport coords
+local TP = {
+	Middle = cf(0,130,0),
+	Red    = cf(-130,30,0),
+	Green  = cf(0,30,-130),
+	Blue   = cf(0,30,130),
+	Yellow = cf(130,30,0),
+}
+
+-- ===== features =====
+-- Noclip
+local noclipEnabled, noclipConn = false, nil
+local function setNoclip(enabled)
+	if enabled and not noclipConn then
+		noclipEnabled = true
+		noclipConn = RunService.Stepped:Connect(function()
+			local char = player.Character
+			if char then
+				for _, part in ipairs(char:GetDescendants()) do
+					if part:IsA("BasePart") then part.CanCollide = false end
+				end
+			end
+		end)
+	else
+		noclipEnabled = false
+		if noclipConn then noclipConn:Disconnect(); noclipConn = nil end
+		local char = player.Character
+		if char then
+			for _, part in ipairs(char:GetDescendants()) do
+				if part:IsA("BasePart") then part.CanCollide = true end
+			end
+		end
+	end
+end
+
+-- Chams (toggle)
+local chamsOn = false
+local function setChams(enabled)
+	chamsOn = enabled
+	if not enabled then
+		for _, plr in ipairs(Players:GetPlayers()) do
+			if plr.Character then
+				for _, gui in ipairs(plr.Character:GetDescendants()) do
+					if gui:IsA("SurfaceGui") and gui.Name == "CattoCham" then gui:Destroy() end
+				end
+			end
+		end
+		return
+	end
+	task.spawn(function()
+		while chamsOn do
+			for _, plr in ipairs(Players:GetPlayers()) do
+				if plr ~= player and plr.Character then
+					for _, part in ipairs(plr.Character:GetChildren()) do
+						if (part:IsA("MeshPart") or part.Name == "Head") and not part:FindFirstChild("CattoCham") then
+							local function mk(face)
+								local s = Instance.new("SurfaceGui")
+								s.Name = "CattoCham"
+								s.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+								s.Face = face
+								s.LightInfluence = 0
+								s.AlwaysOnTop = true
+								s.ResetOnSpawn = false
+								s.Parent = part
+								local fr = Instance.new("Frame", s)
+								fr.BackgroundColor3 = Color3.fromRGB(255,0,0)
+								fr.Size = UDim2.new(1,0,1,0)
+							end
+							mk(Enum.NormalId.Back);  mk(Enum.NormalId.Front)
+							mk(Enum.NormalId.Top);   mk(Enum.NormalId.Bottom)
+							mk(Enum.NormalId.Right); mk(Enum.NormalId.Left)
+						end
+					end
+				end
+			end
+			task.wait(1)
+		end
+	end)
+end
+
+-- Executor-based features kept
+local function loadESP()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Rollimonster/Roblox-esp/main/Roblox-esp", true))()
+end
+
+local function loadTpAllHead()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Rollimonster/roblox-tp-all-head/main/roblox%20tp%20all%20head", true))()
+end
+
+-- ===== UI =====
+local gui, root, header
+local function clampToScreen(frame)
+	local cam = workspace.CurrentCamera
+	local vp = cam and cam.ViewportSize or Vector2.new(1920,1080)
+	local x = math.clamp(frame.Position.X.Offset, -frame.AbsoluteSize.X + 12, vp.X - 12)
+	local y = math.clamp(frame.Position.Y.Offset, 12, vp.Y - frame.AbsoluteSize.Y - 12)
+	frame.Position = UDim2.new(frame.Position.X.Scale, x, frame.Position.Y.Scale, y)
+end
+
+local function SectionHeader(parent, text)
+	local wrap = Instance.new("Frame")
+	wrap.BackgroundColor3 = Color3.fromRGB(22,22,22)
+	wrap.BackgroundTransparency = 0.15
+	wrap.Size = UDim2.new(1, 0, 0, 32)
+	wrap.Parent = parent
+
+	local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, 8); corner.Parent = wrap
+
+	local lbl = Instance.new("TextLabel")
+	lbl.BackgroundTransparency = 1
+	lbl.Size = UDim2.new(1, -10, 1, 0)
+	lbl.Position = UDim2.new(0, 10, 0, 0)
+	lbl.Font = Enum.Font.GothamSemibold
+	lbl.TextScaled = true
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.TextColor3 = Color3.fromRGB(235,235,235)
+	lbl.Text = string.upper(text)
+	lbl.Parent = wrap
+
+	local line = Instance.new("Frame")
+	line.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	line.BackgroundTransparency = 0.85
+	line.BorderSizePixel = 0
+	line.Size = UDim2.new(1, 0, 0, 1)
+	line.Position = UDim2.new(0, 0, 1, -1)
+	line.Parent = wrap
+
+	return wrap
+end
+
+local function Button(parent, label, callback)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1, 0, 0, 40)
+	b.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	b.Text = label
+	b.TextScaled = true
+	b.Font = Enum.Font.GothamMedium
+	b.TextColor3 = Color3.fromRGB(255,255,255)
+	b.AutoButtonColor = true
+	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 10); c.Parent = b
+	b.MouseButton1Click:Connect(callback)
+	b.Parent = parent
+	return b
+end
+
+local function buildUI()
+	if gui then gui:Destroy() end
+	local pgui = player:FindFirstChild("PlayerGui") or player:WaitForChild("PlayerGui")
+
+	gui = Instance.new("ScreenGui")
+	gui.Name = "CattoHubUI"
+	gui.IgnoreGuiInset = true
+	gui.ResetOnSpawn = false
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	gui.DisplayOrder = 9999
+	gui.Parent = pgui
+
+	root = Instance.new("Frame")
+	root.Name = "Root"
+	root.AnchorPoint = Vector2.new(1, 0.5)
+	root.Position = UDim2.new(1, -24, 0.5, 0)
+	root.Size = UDim2.new(0, 380, 0, 560)
+	root.BackgroundColor3 = Color3.fromRGB(15,15,15)
+	root.BackgroundTransparency = 0.25
+	root.Active = true
+	root.Parent = gui
+	local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, 18); corner.Parent = root
+	local stroke = Instance.new("UIStroke"); stroke.Thickness = 2; stroke.Color = Color3.fromRGB(255,255,255); stroke.Transparency = 0.82; stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border; stroke.Parent = root
+
+	-- Header (avatar, title, username)
+	header = Instance.new("Frame")
+	header.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	header.BackgroundTransparency = 0.2
+	header.Size = UDim2.new(1, -24, 0, 84)
+	header.Position = UDim2.new(0, 12, 0, 12)
+	header.Parent = root
+	local hCorner = Instance.new("UICorner"); hCorner.CornerRadius = UDim.new(0, 14); hCorner.Parent = header
+
+	local avatar = Instance.new("ImageLabel")
+	avatar.BackgroundTransparency = 1
+	avatar.Size = UDim2.new(0, 58, 0, 58)
+	avatar.Position = UDim2.new(0, 12, 0, 13)
+	avatar.Parent = header
+	local avatCorner = Instance.new("UICorner"); avatCorner.CornerRadius = UDim.new(1, 0); avatCorner.Parent = avatar
+
+	local title = Instance.new("TextLabel")
+	title.BackgroundTransparency = 1
+	title.Position = UDim2.new(0, 86, 0, 12)
+	title.Size = UDim2.new(1, -98, 0, 34)
+	title.Font = Enum.Font.GothamBold
+	title.TextScaled = true
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.TextColor3 = Color3.fromRGB(255,255,255)
+	title.Text = "CATTO HUB"
+	title.Parent = header
+
+	local uname = Instance.new("TextLabel")
+	uname.BackgroundTransparency = 1
+	uname.Position = UDim2.new(0, 86, 0, 48)
+	uname.Size = UDim2.new(1, -98, 0, 24)
+	uname.Font = Enum.Font.Gotham
+	uname.TextScaled = true
+	uname.TextXAlignment = Enum.TextXAlignment.Left
+	uname.TextColor3 = Color3.fromRGB(210,210,210)
+	uname.Text = (player.DisplayName or player.Name)
+	uname.Parent = header
+
+	-- Discord row
+	local discordRow = Instance.new("Frame")
+	discordRow.BackgroundTransparency = 1
+	discordRow.Position = UDim2.new(0, 12, 0, 104)
+	discordRow.Size = UDim2.new(1, -24, 0, 36)
+	discordRow.Parent = root
+
+	local discordBtn = Instance.new("TextButton")
+	discordBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+	discordBtn.BackgroundTransparency = 0.2
+	discordBtn.Size = UDim2.new(0.7, -4, 1, 0)
+	discordBtn.Position = UDim2.new(0, 0, 0, 0)
+	discordBtn.Text = "discord.gg/Ey9uGhp3vQ"
+	discordBtn.Font = Enum.Font.Gotham
+	discordBtn.TextScaled = true
+	discordBtn.TextColor3 = Color3.fromRGB(230,230,230)
+	discordBtn.AutoButtonColor = true
+	discordBtn.Parent = discordRow
+	local dCorner = Instance.new("UICorner"); dCorner.CornerRadius = UDim.new(0, 10); dCorner.Parent = discordBtn
+
+	local copyBtn = Instance.new("TextButton")
+	copyBtn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	copyBtn.Size = UDim2.new(0.3, -4, 1, 0)
+	copyBtn.Position = UDim2.new(0.7, 8, 0, 0)
+	copyBtn.Text = "Copy Link"
+	copyBtn.Font = Enum.Font.GothamBold
+	copyBtn.TextScaled = true
+	copyBtn.TextColor3 = Color3.fromRGB(0,0,0)
+	copyBtn.Parent = discordRow
+	local cCorner = Instance.new("UICorner"); cCorner.CornerRadius = UDim.new(0, 10); cCorner.Parent = copyBtn
+	copyBtn.MouseButton1Click:Connect(function()
+		pcall(function() if setclipboard then setclipboard("https://discord.gg/Ey9uGhp3vQ") end end)
+	end)
+
+	-- Scroll host
+	local listHolder = Instance.new("Frame")
+	listHolder.BackgroundTransparency = 1
+	listHolder.Position = UDim2.new(0, 12, 0, 148)
+	listHolder.Size = UDim2.new(1, -24, 1, -160)
+	listHolder.Parent = root
+
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.BackgroundTransparency = 1
+	scroll.Size = UDim2.new(1, 0, 1, 0)
+	scroll.CanvasSize = UDim2.new(0,0,0,0)
+	scroll.ScrollBarThickness = 6
+	scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+	scroll.Parent = listHolder
+
+	local layout = Instance.new("UIListLayout")
+	layout.Padding = UDim.new(0, 10)
+	layout.SortOrder = Enum.SortOrder.LayoutOrder
+	layout.Parent = scroll
+	local function updateCanvas()
+		scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 8)
+	end
+	layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+
+	-- ===== Sections in order: Others, Esp, Tps =====
+	SectionHeader(scroll, "Others")
+	local noclipBtn
+	noclipBtn = Button(scroll, "Noclip: OFF", function()
+		setNoclip(not noclipEnabled)
+		noclipBtn.Text = "Noclip: " .. (noclipEnabled and "ON" or "OFF")
+	end)
+	Button(scroll, "Tp All Head (load)", function()
+		loadTpAllHead()
+	end)
+
+	SectionHeader(scroll, "Esp")
+	Button(scroll, "ESP (load)", function()
+		loadESP()
+	end)
+	local chamsBtn
+	chamsBtn = Button(scroll, "Chams: OFF", function()
+		local nextState = not chamsOn
+		setChams(nextState)
+		chamsBtn.Text = "Chams: " .. (nextState and "ON" or "OFF")
+	end)
+
+	SectionHeader(scroll, "Tps")
+	Button(scroll, "TP: Middle", function() tp(TP.Middle) end)
+	Button(scroll, "TP: Red",    function() tp(TP.Red)    end)
+	Button(scroll, "TP: Green",  function() tp(TP.Green)  end)
+	Button(scroll, "TP: Blue",   function() tp(TP.Blue)   end)
+	Button(scroll, "TP: Yellow", function() tp(TP.Yellow) end)
+
+	-- spacer
+	do local s=Instance.new("Frame"); s.BackgroundTransparency=1; s.Size=UDim2.new(1,0,0,6); s.Parent=scroll end
+
+	-- avatar
+	task.spawn(function()
+		local content = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+		avatar.Image = content
+	end)
+
+	updateCanvas()
+	clampToScreen(root)
+
+	-- Drag via header
+	do
+		local dragging, dragStart, startPos, dragInput = false, nil, nil, nil
+		local function update(input)
+			local delta = input.Position - dragStart
+			root.Position = UDim2.new(root.Position.X.Scale, startPos.X.Offset + delta.X, root.Position.Y.Scale, startPos.Y.Offset + delta.Y)
+			clampToScreen(root)
+		end
+		header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true; dragStart = input.Position; startPos = root.Position
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then dragging = false end
+				end)
+			end
+		end)
+		header.InputChanged:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				dragInput = input
+			end
+		end)
+		UIS.InputChanged:Connect(function(input)
+			if input == dragInput and dragging then update(input) end
+		end)
+	end
+end
+
+-- Build once
+buildUI()
+
+-- Hotkeys: F1 show/hide, F2 rebuild
+UIS.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.F1 then
+		if gui then gui.Enabled = not gui.Enabled end
+	elseif input.KeyCode == Enum.KeyCode.F2 then
+		buildUI()
+	end
+end)
