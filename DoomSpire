@@ -4,10 +4,12 @@
 
 script.Name = "CattoHub"
 
-local Players      = game:GetService("Players")
-local UIS          = game:GetService("UserInputService")
-local RunService   = game:GetService("RunService")
-local player       = Players.LocalPlayer
+local Players        = game:GetService("Players")
+local UIS            = game:GetService("UserInputService")
+local RunService     = game:GetService("RunService")
+local TeleportService= game:GetService("TeleportService")
+local HttpService    = game:GetService("HttpService")
+local player         = Players.LocalPlayer
 
 -- ===== helpers =====
 local function waitForCharacter(p)
@@ -107,13 +109,48 @@ local function setChams(enabled)
 	end)
 end
 
--- Executor-based features kept
+-- ESP (executor-based)
 local function loadESP()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Rollimonster/Roblox-esp/main/Roblox-esp", true))()
 end
 
+-- Tp All Head (executor-based)
 local function loadTpAllHead()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/Rollimonster/roblox-tp-all-head/main/roblox%20tp%20all%20head", true))()
+end
+
+-- ===== Server Hop (Doomspire) =====
+local DOOMSPIRE_PLACE_ID = 1215581239
+
+local function findDifferentServer(placeId)
+	local cursor = ""
+	for _ = 1, 5 do -- check a few pages max
+		local url = ("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100%s")
+			:format(placeId, cursor ~= "" and ("&cursor="..cursor) or "")
+		local ok, body = pcall(function() return game:HttpGet(url) end)
+		if not ok then break end
+		local data = HttpService:JSONDecode(body)
+		for _, srv in ipairs(data.data or {}) do
+			if srv.playing < srv.maxPlayers and srv.id ~= game.JobId then
+				return srv.id
+			end
+		end
+		cursor = data.nextPageCursor or ""
+		if cursor == "" then break end
+	end
+	return nil
+end
+
+local function hopDoomspire()
+	local jobId = nil
+	-- Try to pick a different not-full public server via the games API (requires executor http perms)
+	local ok = pcall(function() jobId = findDifferentServer(DOOMSPIRE_PLACE_ID) end)
+	if ok and jobId then
+		TeleportService:TeleportToPlaceInstance(DOOMSPIRE_PLACE_ID, jobId, player)
+	else
+		-- Fallback: generic Teleport (Roblox will usually route you to a new instance)
+		TeleportService:Teleport(DOOMSPIRE_PLACE_ID, player)
+	end
 end
 
 -- ===== UI =====
@@ -302,6 +339,9 @@ local function buildUI()
 	Button(scroll, "Tp All Head (load)", function()
 		loadTpAllHead()
 	end)
+	Button(scroll, "Server Hop (Doomspire)", function()
+		hopDoomspire()
+	end)
 
 	SectionHeader(scroll, "Esp")
 	Button(scroll, "ESP (load)", function()
@@ -372,3 +412,4 @@ UIS.InputBegan:Connect(function(input, gp)
 		buildUI()
 	end
 end)
+
